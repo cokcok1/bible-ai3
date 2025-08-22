@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+  <meta charset="utf-8" />
+  <title>PDF → Gemini 純文字問答 (Frontend Only)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.run/@google/genai"
+      }
+    }
+  </script>
+  <style>
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans TC",sans-serif; margin: 24px; }
+    .card { max-width: 880px; margin: 0 auto; padding: 20px; border: 1px solid #e5e5e5; border-radius: 12px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    textarea { width: 100%; min-height: 120px; padding: 10px; }
+    #answer { white-space: pre-wrap; border: 1px solid #eee; border-radius: 8px; padding: 12px; min-height: 140px; }
+    button { padding: 10px 16px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; }
+    small.muted { color: #666; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>📄 PDF → Gemini 純文字問答</h2>
+    <p><small class="muted">支援 PDF ≤ 20MB。你現時係 2MB，直接用 inlineData。</small></p>
+
+    <div class="row">
+      <input id="pdf" type="file" accept="application/pdf" />
+      <button id="ask">送出</button>
+    </div>
+
+    <p>
+      <textarea id="q" placeholder="請輸入問題。例如：請根據文件內容，用要點列出重點，標注(頁碼)，所有回覆只需純文字，毋須任何檔案或代碼區塊。"></textarea>
+    </p>
+
+    <h3>答案（純文字）</h3>
+    <div id="answer"></div>
+  </div>
+
+<script type="module">
+import { GoogleGenerativeAI, createPart } from "@google/genai";
+
+// 1) 直接使用已設好 HTTP referrer 限制的 API Key
+const API_KEY = "YOUR_API_KEY"; // ← 換成你的 Key
+const MODEL_ID = "gemini-2.0-flash"; // 或 "gemini-2.5-flash"
+
+const ai = new GoogleGenerativeAI(API_KEY);
+const model = ai.getGenerativeModel({ model: MODEL_ID });
+
+const $ = sel => document.querySelector(sel);
+$("#ask").addEventListener("click", async () => {
+  const out = $("#answer");
+  out.textContent = "";
+  try {
+    const file = $("#pdf").files?.[0];
+    if (!file) { out.textContent = "請先選擇 PDF 檔案。"; return; }
+    if (file.type !== "application/pdf") { out.textContent = "只支援 PDF。"; return; }
+
+    // 2) 檔案轉 base64（inlineData 適合 ≤20MB）
+    const base64 = await file.arrayBuffer().then(buf => {
+      let bin = "";
+      const bytes = new Uint8Array(buf);
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+      }
+      return btoa(bin);
+    });
+
+    // 3) 問題（加入「純文字輸出」提示）
+    const userQ = ($("#q").value || "請用要點列出文件重點，並於每點後標注(頁碼)。")
+      + "\n\n要求：以純文字作答，不要代碼區塊、不要上傳或產生任何檔案。";
+
+    out.textContent = "⏳ 生成中…";
+
+    // 4) 呼叫 Gemini，附上 PDF（inlineData）
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { text: userQ },
+            createPart({
+              inlineData: {
+                mimeType: "application/pdf",
+                data: base64
+              }
+            })
+          ]
+        }
+      ]
+    });
+
+    // 5) 顯示純文字答案
+    out.textContent = result.response.text() || "（沒有文字回傳）";
+  } catch (err) {
+    console.error(err);
+    const msg = (err && err.message) ? err.message : String(err);
+    $("#answer").textContent = "發生錯誤：\n" + msg;
+  }
+});
+</script>
+</body>
+</html>
