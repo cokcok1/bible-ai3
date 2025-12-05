@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經研讀 (V14)</title>
+    <title>聖經研讀 (V15)</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="bible-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="bible-icon.png">
@@ -49,10 +49,8 @@
             margin-bottom: 25px;
         }
 
-        /* V14: 合併後的頂部區塊樣式 */
-        .main-control-card {
-            text-align: center; /* 讓標題居中 */
-        }
+        /* 頂部控制卡片 */
+        .main-control-card { text-align: center; }
 
         h1 { margin: 0; color: var(--primary); font-size: 1.6rem; font-weight: 700; margin-bottom: 5px; }
         .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
@@ -62,18 +60,17 @@
         .progress-bar { width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; margin-top: 10px; }
         .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
 
-        /* 控制面板網格 (V14: 調整為靠左對齊) */
+        /* 控制面板網格 */
         .controls-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-            text-align: left; /* 讓控件內容靠左 */
+            text-align: left;
             opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
         }
         .controls-grid.active { opacity: 1; pointer-events: all; }
         
         .full-width { grid-column: 1 / -1; width: 100%; }
-        /* V14: 修復節數選擇器寬度不一致的問題 */
         .verse-group { display: flex; align-items: center; gap: 8px; grid-column: 1 / -1; width: 100%; }
-        .verse-select { flex: 1; } /* 讓兩個節數選擇器平分空間 */
+        .verse-select { flex: 1; }
         
         /* 輸入控件玻璃化 */
         select, .read-btn, .nav-btn {
@@ -83,15 +80,13 @@
             padding: 12px; font-size: 16px; color: var(--text);
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: all 0.2s;
-            width: 100%; /* 確保寬度佔滿容器 */
-            box-sizing: border-box; /* 包含 padding 在寬度計算內 */
+            width: 100%; box-sizing: border-box;
         }
         select:focus { outline: none; box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2); }
 
         /* 導航列 */
         .nav-row { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 5px; }
         
-        /* 閱讀按鈕 */
         .read-btn {
             flex-grow: 2; font-weight: bold; cursor: pointer;
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
@@ -100,11 +95,10 @@
         }
         .read-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4); }
 
-        /* 前後按鈕 */
         .nav-btn {
             flex-grow: 0; min-width: 60px; font-size: 20px; font-weight: bold; cursor: pointer;
             background: rgba(255, 255, 255, 0.9); color: var(--primary);
-            width: auto; /* 覆蓋上面的 width:100% */
+            width: auto;
         }
         .nav-btn:hover { background: white; }
 
@@ -116,7 +110,7 @@
         
         .glass-btn {
             padding: 14px; border-radius: 16px; border: none;
-            color: white; font-weight: 600; font-size: 0.85rem; /* 稍微調小字體以容納長文字 */
+            color: white; font-weight: 600; font-size: 0.85rem;
             display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer;
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
@@ -124,7 +118,7 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1), inset 0 2px 3px rgba(255,255,255,0.2);
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            white-space: nowrap; /* 防止文字換行 */
+            white-space: nowrap;
         }
         .glass-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.15), inset 0 2px 3px rgba(255,255,255,0.3); }
         .glass-btn:active { transform: translateY(-1px); }
@@ -147,8 +141,6 @@
         .gemini-header { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
         .gemini-content { font-size: 1.05rem; line-height: 1.8; color: #444; }
         .gemini-content h1, .gemini-content h2 { color: var(--primary); margin-top: 20px; }
-        
-        /* V14: 移除 Gemini 強調文字的背景色，只保留紅色粗體 */
         .gemini-content strong { color: #c0392b; background: none; padding: 0; }
 
         .ai-loading { text-align: center; padding: 20px; font-style: italic; color: #666; display: none; }
@@ -158,10 +150,9 @@
         .footer-note { text-align: right; font-size: 0.75rem; color: #999; margin-top: 30px; font-style: italic; }
 
         @media (max-width: 600px) { 
-            /* 手機版調整 */
             .controls-grid { grid-template-columns: 1fr; } 
             .action-area { grid-template-columns: 1fr; }
-            .glass-btn { font-size: 1rem; padding: 12px; white-space: normal; } /* 手機上允許換行 */
+            .glass-btn { font-size: 1rem; padding: 12px; white-space: normal; }
             .glass-card { padding: 20px; }
         }
     </style>
@@ -171,7 +162,7 @@
 <div class="container">
     <div class="glass-card main-control-card">
         <h1>📖 聖經研讀</h1>
-        <div class="subtitle">資料來源：和合本繁體 (Github/cokcok1)</div>
+        <div class="subtitle">資料來源：和合本繁體</div>
 
         <div id="loadingArea" class="loading-container">
             <div id="loadingText" style="color:#666; font-size: 0.9rem;">正在下載資料庫 (4.5MB)...</div>
@@ -233,7 +224,7 @@
     let bookOrder = [];
 
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V14-Merged)`;
+    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V15-CleanPrompt)`;
 
     window.onload = async function() {
         try {
@@ -431,14 +422,13 @@
         document.getElementById('displayText').innerHTML = displayText;
         document.getElementById('actionArea').style.display = 'grid';
 
-        generateHiddenPrompt(refText, promptText);
+        // V15: 呼叫生成時，不再傳入經文文字
+        generateHiddenPrompt(refText, ""); 
     }
 
+    // V15: 已更新的生成邏輯，不再包含經文內容
     function generateHiddenPrompt(ref, text) {
         const prompt = `請用中文（繁體）並以基督教信仰和聖經真理為基礎，解釋聖經【${ref}】。
-
-經文內容：
-"${text.replace(/\n/g, ' ')}"
 
 請提供：
 - 【經文概要】概述此章內容與主要事件。
