@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經 AI 深度研讀 (V13-白色玻璃版)</title>
+    <title>聖經研讀 (V14)</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="bible-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="bible-icon.png">
@@ -16,10 +16,8 @@
         :root {
             --primary: #2c3e50;
             --accent: #8e44ad;
-            /* 背景改為極淺的米白色，製造通透感 */
             --bg: #f0f2f5; 
             --text: #333;
-            /* 玻璃卡片的基礎設定 */
             --glass-bg: rgba(255, 255, 255, 0.7);
             --glass-border: 1px solid rgba(255, 255, 255, 0.9);
             --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
@@ -28,7 +26,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg); /* 純色背景 */
+            background: var(--bg);
             margin: 0;
             padding: 20px;
             color: var(--text);
@@ -51,44 +49,49 @@
             margin-bottom: 25px;
         }
 
-        /* 標題區塊 (新設計) */
-        .header-card {
-            text-align: center;
-            padding: 20px;
+        /* V14: 合併後的頂部區塊樣式 */
+        .main-control-card {
+            text-align: center; /* 讓標題居中 */
         }
-        h1 { margin: 0; color: var(--primary); font-size: 1.6rem; font-weight: 700; }
-        .subtitle { margin-top: 8px; color: #666; font-size: 0.9rem; }
+
+        h1 { margin: 0; color: var(--primary); font-size: 1.6rem; font-weight: 700; margin-bottom: 5px; }
+        .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
 
         /* 載入狀態 */
-        .loading-container { text-align: center; margin: 20px 0; }
+        .loading-container { text-align: center; margin: 10px 0 20px 0; }
         .progress-bar { width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; margin-top: 10px; }
         .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
 
-        /* 控制面板 (玻璃化) */
-        .controls {
+        /* 控制面板網格 (V14: 調整為靠左對齊) */
+        .controls-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            text-align: left; /* 讓控件內容靠左 */
             opacity: 0.5; pointer-events: none; transition: opacity 0.3s;
         }
-        .controls.active { opacity: 1; pointer-events: all; }
+        .controls-grid.active { opacity: 1; pointer-events: all; }
         
-        .full-width { grid-column: 1 / -1; }
-        .verse-group { display: flex; align-items: center; gap: 8px; grid-column: 1 / -1; }
+        .full-width { grid-column: 1 / -1; width: 100%; }
+        /* V14: 修復節數選擇器寬度不一致的問題 */
+        .verse-group { display: flex; align-items: center; gap: 8px; grid-column: 1 / -1; width: 100%; }
+        .verse-select { flex: 1; } /* 讓兩個節數選擇器平分空間 */
         
         /* 輸入控件玻璃化 */
         select, .read-btn, .nav-btn {
-            background: rgba(255, 255, 255, 0.9); /* 比卡片更不透明 */
+            background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(0,0,0,0.05);
             border-radius: 12px;
             padding: 12px; font-size: 16px; color: var(--text);
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: all 0.2s;
+            width: 100%; /* 確保寬度佔滿容器 */
+            box-sizing: border-box; /* 包含 padding 在寬度計算內 */
         }
         select:focus { outline: none; box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2); }
 
         /* 導航列 */
         .nav-row { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 5px; }
         
-        /* 閱讀按鈕 (強調色玻璃) */
+        /* 閱讀按鈕 */
         .read-btn {
             flex-grow: 2; font-weight: bold; cursor: pointer;
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
@@ -101,34 +104,34 @@
         .nav-btn {
             flex-grow: 0; min-width: 60px; font-size: 20px; font-weight: bold; cursor: pointer;
             background: rgba(255, 255, 255, 0.9); color: var(--primary);
+            width: auto; /* 覆蓋上面的 width:100% */
         }
         .nav-btn:hover { background: white; }
 
-        /* 經文卡片 (顯示時才出現) */
+        /* 經文卡片 */
         .scripture-card { display: none; border-top: 4px solid var(--accent); }
 
-        /* 功能按鈕區 (晶透玻璃風格) */
+        /* 功能按鈕區 */
         .action-area { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 25px; }
         
         .glass-btn {
             padding: 14px; border-radius: 16px; border: none;
-            color: white; font-weight: 600; font-size: 0.95rem;
-            display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
+            color: white; font-weight: 600; font-size: 0.85rem; /* 稍微調小字體以容納長文字 */
+            display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer;
             transition: all 0.3s ease;
-            /* 晶透玻璃核心樣式 */
             backdrop-filter: blur(5px);
             border-top: 1px solid rgba(255, 255, 255, 0.4);
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1), inset 0 2px 3px rgba(255,255,255,0.2);
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            white-space: nowrap; /* 防止文字換行 */
         }
         .glass-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.15), inset 0 2px 3px rgba(255,255,255,0.3); }
         .glass-btn:active { transform: translateY(-1px); }
 
-        /* 各別按鈕顏色 */
-        .ai-btn { background: linear-gradient(135deg, #f1c40f88 0%, #f39c12cc 100%); } /* 金色水晶 */
-        .grok-btn { background: linear-gradient(135deg, #34495e88 0%, #2c3e50cc 100%); } /* 黑色黑曜石 */
-        .copy-btn { background: linear-gradient(135deg, #9b59b688 0%, #8e44adcc 100%); } /* 紫色紫水晶 */
+        .ai-btn { background: linear-gradient(135deg, #f1c40f88 0%, #f39c12cc 100%); }
+        .grok-btn { background: linear-gradient(135deg, #34495e88 0%, #2c3e50cc 100%); }
+        .copy-btn { background: linear-gradient(135deg, #9b59b688 0%, #8e44adcc 100%); }
 
         /* 經文內容 */
         .ref-title { font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); }
@@ -138,13 +141,15 @@
         /* Gemini 區塊 */
         .gemini-section {
             display: none; margin-top: 30px;
-            background: rgba(248, 250, 252, 0.8); /* 稍微不透明一點 */
+            background: rgba(248, 250, 252, 0.8);
             border: 1px solid rgba(255,255,255,0.5);
         }
         .gemini-header { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f39c12; }
         .gemini-content { font-size: 1.05rem; line-height: 1.8; color: #444; }
         .gemini-content h1, .gemini-content h2 { color: var(--primary); margin-top: 20px; }
-        .gemini-content strong { color: #c0392b; background: rgba(192, 57, 43, 0.1); padding: 0 4px; border-radius: 4px; }
+        
+        /* V14: 移除 Gemini 強調文字的背景色，只保留紅色粗體 */
+        .gemini-content strong { color: #c0392b; background: none; padding: 0; }
 
         .ai-loading { text-align: center; padding: 20px; font-style: italic; color: #666; display: none; }
         .ai-spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid #f39c12; border-radius: 50%; animation: spin 1s linear infinite; margin-right: 10px; vertical-align: middle; }
@@ -153,8 +158,10 @@
         .footer-note { text-align: right; font-size: 0.75rem; color: #999; margin-top: 30px; font-style: italic; }
 
         @media (max-width: 600px) { 
-            .controls { grid-template-columns: 1fr; } 
+            /* 手機版調整 */
+            .controls-grid { grid-template-columns: 1fr; } 
             .action-area { grid-template-columns: 1fr; }
+            .glass-btn { font-size: 1rem; padding: 12px; white-space: normal; } /* 手機上允許換行 */
             .glass-card { padding: 20px; }
         }
     </style>
@@ -162,37 +169,37 @@
 <body>
 
 <div class="container">
-    <div class="glass-card header-card">
-        <h1>📖 聖經 AI 深度研讀</h1>
+    <div class="glass-card main-control-card">
+        <h1>📖 聖經研讀</h1>
         <div class="subtitle">資料來源：和合本繁體 (Github/cokcok1)</div>
-    </div>
 
-    <div id="loadingArea" class="loading-container">
-        <div id="loadingText" style="color:#666;">正在下載資料庫 (4.5MB)...</div>
-        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-    </div>
-
-    <div id="controlPanel" class="glass-card controls">
-        <select id="bookSelect" class="full-width" onchange="updateChapters()"><option>載入中...</option></select>
-        <select id="chapterSelect" class="full-width" onchange="updateStartVerses()"><option>-</option></select>
-        
-        <div class="verse-group">
-            <select id="startVerseSelect" onchange="updateEndVerses()"><option>-</option></select>
-            <span id="toLabel" style="display:none; color:#999;">至</span>
-            <select id="endVerseSelect" style="display:none;"><option>-</option></select>
+        <div id="loadingArea" class="loading-container">
+            <div id="loadingText" style="color:#666; font-size: 0.9rem;">正在下載資料庫 (4.5MB)...</div>
+            <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
         </div>
 
-        <div class="nav-row">
-            <button class="nav-btn" onclick="prevChapter()" title="上一章">❮</button>
-            <button class="read-btn" onclick="displayScripture()">閱讀經文</button>
-            <button class="nav-btn" onclick="nextChapter()" title="下一章">❯</button>
+        <div id="controlGrid" class="controls-grid">
+            <select id="bookSelect" class="full-width" onchange="updateChapters()"><option>載入中...</option></select>
+            <select id="chapterSelect" class="full-width" onchange="updateStartVerses()"><option>-</option></select>
+            
+            <div class="verse-group">
+                <select id="startVerseSelect" class="verse-select" onchange="updateEndVerses()"><option>-</option></select>
+                <span id="toLabel" style="display:none; color:#999;">至</span>
+                <select id="endVerseSelect" class="verse-select" style="display:none;"><option>-</option></select>
+            </div>
+
+            <div class="nav-row">
+                <button class="nav-btn" onclick="prevChapter()" title="上一章">❮</button>
+                <button class="read-btn" onclick="displayScripture()">閱讀經文</button>
+                <button class="nav-btn" onclick="nextChapter()" title="下一章">❯</button>
+            </div>
         </div>
     </div>
 
     <div id="resultCard" class="glass-card scripture-card">
         
         <div id="actionArea" class="action-area">
-            <button class="glass-btn ai-btn" onclick="callGeminiAPI()">✨ Gemini 解經(VPN)</button>
+            <button class="glass-btn ai-btn" onclick="callGeminiAPI()">✨ Gemini 解經(VPN/非香港用戶)</button>
             <button class="glass-btn grok-btn" onclick="openGrok()">🚀 前往 Grok</button>
             <button class="glass-btn copy-btn" id="copyBtn" onclick="copyPrompt()">📋 複製指令</button>
         </div>
@@ -226,7 +233,7 @@
     let bookOrder = [];
 
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V13-WhiteGlass)`;
+    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V14-Merged)`;
 
     window.onload = async function() {
         try {
@@ -247,7 +254,7 @@
             let text = new TextDecoder("utf-8").decode(concatUint8Arrays(chunks));
             parseBibleText(text);
             document.getElementById('loadingArea').style.display = 'none';
-            document.getElementById('controlPanel').className += ' active';
+            document.getElementById('controlGrid').className += ' active';
             initSelectors();
         } catch (e) {
             document.getElementById('loadingText').innerText = "錯誤：" + e.message;
@@ -400,7 +407,6 @@
             refText = `${book} 第 ${chap} 章`;
             const verses = bibleData[book][chap];
             Object.keys(verses).map(Number).sort((a,b)=>a-b).forEach(v => {
-                // V13: 使用新的 span class 來美化節數
                 displayText += `<span class='verse-num'>[${v}]</span>${verses[v]}\n`;
                 promptText += `${v}. ${verses[v]}\n`;
             });
@@ -414,7 +420,6 @@
             }
             for (let i = startNum; i <= endNum; i++) {
                 if (bibleData[book][chap][i]) {
-                    // V13: 使用新的 span class
                     displayText += `<span class='verse-num'>[${i}]</span>${bibleData[book][chap][i]}\n`;
                     promptText += `${i}. ${bibleData[book][chap][i]}\n`;
                 }
@@ -502,13 +507,12 @@
         if (!txt) return;
         const onSuccess = () => {
             const btn = document.getElementById('copyBtn');
-            const originalText = "📋 僅複製指令";
+            const originalText = "📋 複製指令";
             btn.innerText = "✅ 成功";
-            // 複製成功時，按鈕變為綠色水晶
             btn.style.background = "linear-gradient(135deg, #27ae6088 0%, #2ecc71cc 100%)";
             setTimeout(() => { 
                 btn.innerText = originalText; 
-                btn.style.background = ""; // 回復原本的紫色水晶
+                btn.style.background = ""; 
             }, 2000);
         };
         if (navigator.clipboard && window.isSecureContext) {
