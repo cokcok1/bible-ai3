@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經研讀 (V20)</title>
+    <title>聖經研讀 (V21)</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="bible-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="bible-icon.png">
@@ -23,7 +23,10 @@
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: 1px solid rgba(255, 255, 255, 0.9);
             --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --scripture-size: 1.25rem; 
+            --scripture-size: 1.25rem;
+            
+            /* V21: 補回遺失的按鈕顏色變數 */
+            --nav-btn-color: #95a5a6; 
         }
 
         body {
@@ -101,6 +104,7 @@
 
         .nav-row { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 5px; }
         
+        /* 統一按鈕高度 */
         .read-btn, .nav-btn, .ai-btn, .grok-btn, .copy-btn {
             height: 52px; box-sizing: border-box;
             display: flex; align-items: center; justify-content: center;
@@ -112,11 +116,14 @@
         }
         .read-btn:hover { background-color: #34495e; }
 
+        /* 導航按鈕 (左右箭頭) */
         .nav-btn {
             flex-grow: 0; min-width: 60px;
-            background-color: var(--nav-btn-color); color: white; border: none;
+            background-color: var(--nav-btn-color); /* V21 修復：現在有顏色了 */
+            color: white; border: none;
             border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;
         }
+        .nav-btn:hover { background-color: #7f8c8d; }
 
         /* 經文卡片 */
         .scripture-card {
@@ -251,7 +258,7 @@
             <div id="geminiResult" class="gemini-content"></div>
         </div>
 
-        <div class="footer-note" id="footerVer">Powered by Google Gemini AI解釋內容只供參考 2025-12-30 (V20)</div>
+        <div class="footer-note" id="footerVer">Powered by Google Gemini AI解釋內容只供參考 2025-12-30 (V21)</div>
     </div>
 </div>
 
@@ -266,7 +273,7 @@
     let currentFontSize = 1.25;
 
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V20)`;
+    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V21)`;
 
     window.onload = async function() {
         try {
@@ -329,16 +336,13 @@
         document.documentElement.style.setProperty('--scripture-size', `${currentFontSize}rem`);
     }
 
-    // --- V20 修復：智能搜尋邏輯 ---
+    // --- V20 智能搜尋邏輯 ---
     function searchBible() {
         const rawKeyword = document.getElementById('searchInput').value.trim();
         const resultsDiv = document.getElementById('searchResults');
         
         if (!rawKeyword) { alert("請輸入搜尋關鍵字"); return; }
-        
-        // 1. 移除關鍵字中的所有空格，確保「天 父」和「天父」都變成「天父」
         const cleanKeyword = rawKeyword.replace(/\s+/g, '');
-        
         if (cleanKeyword.length < 1) return;
 
         resultsDiv.style.display = 'block';
@@ -353,8 +357,6 @@
                 for (let chap in bibleData[book]) {
                     for (let ver in bibleData[book][chap]) {
                         const originalText = bibleData[book][chap][ver];
-                        
-                        // 2. 將經文內容的空格也移除，進行比對
                         const cleanText = originalText.replace(/\s+/g, '');
                         
                         if (cleanText.includes(cleanKeyword)) {
@@ -376,15 +378,11 @@
                     <button style="float:right; border:none; background:none; color:#999; cursor:pointer;" onclick="closeSearch()">✕ 關閉</button>
                 </div>`;
                 
-                // 3. 準備高亮正則：將關鍵字每個字之間插入 \s* (允許任意空格)
-                // 例如 "天父" -> /天\s*父/g
                 const escapedKeyword = cleanKeyword.split('').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*');
                 const highlightRegex = new RegExp(`(${escapedKeyword})`, 'g');
 
                 results.forEach(res => {
-                    // 使用正則在原文中進行高亮
                     const highlighted = res.text.replace(highlightRegex, `<span style="background:#f1c40f55; font-weight:bold;">$1</span>`);
-                    
                     html += `<div class="result-item" onclick="jumpToScripture('${res.book}', ${res.chap}, ${res.ver})">
                         <span class="result-ref">${res.book} ${res.chap}:${res.ver}</span>
                         <div class="result-text">${highlighted}</div>
