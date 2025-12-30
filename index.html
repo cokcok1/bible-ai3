@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經研讀 (V19)</title>
+    <title>聖經研讀 (V20)</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="bible-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="bible-icon.png">
@@ -23,8 +23,6 @@
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: 1px solid rgba(255, 255, 255, 0.9);
             --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            
-            /* V19: 動態字體變數 */
             --scripture-size: 1.25rem; 
         }
 
@@ -59,10 +57,8 @@
             margin-bottom: 20px;
         }
 
-        /* V19: 工具列 (搜尋 + 字體) */
-        .tools-row {
-            display: flex; gap: 8px; margin-bottom: 15px;
-        }
+        /* 工具列 */
+        .tools-row { display: flex; gap: 8px; margin-bottom: 15px; }
         .search-input {
             flex-grow: 1;
             padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px;
@@ -83,12 +79,10 @@
             background: #fff; border: 1px solid #eee; border-radius: 8px;
             margin-bottom: 15px; padding: 10px;
         }
-        .result-item {
-            padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer;
-        }
+        .result-item { padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
         .result-item:hover { background: #f9f9f9; }
         .result-ref { font-weight: bold; color: var(--accent); display: block; margin-bottom: 4px; }
-        .result-text { font-size: 0.9rem; color: #555; }
+        .result-text { font-size: 0.9rem; color: #555; line-height: 1.5; }
 
         /* 控制面板網格 */
         .controls-grid {
@@ -153,7 +147,6 @@
             font-size: 1.3rem; font-weight: bold; color: var(--accent);
             margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
         }
-        /* V19: 使用變數控制字體大小 */
         .scripture-text {
             font-size: var(--scripture-size); 
             line-height: 1.8; white-space: pre-wrap; color: #000;
@@ -258,25 +251,22 @@
             <div id="geminiResult" class="gemini-content"></div>
         </div>
 
-        <div class="footer-note" id="footerVer">Powered by Google Gemini AI解釋內容只供參考 2025-12-30 (V19)</div>
+        <div class="footer-note" id="footerVer">Powered by Google Gemini AI解釋內容只供參考 2025-12-30 (V20)</div>
     </div>
 </div>
 
 <textarea id="hiddenPrompt" style="display:none;"></textarea>
 
 <script>
-    // Cloudflare Worker API
     const GEMINI_API_URL = 'https://little-thunder-4b7b.imsklam1.workers.dev';
     const BIBLE_URL = 'https://cokcok1.github.io/bible-ai/chinese_union_trad_trad.txt';
     
     let bibleData = {};
     let bookOrder = [];
-    // V19: 字體大小變數 (預設 1.25rem)
     let currentFontSize = 1.25;
 
-    // 更新日期
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V19)`;
+    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V20)`;
 
     window.onload = async function() {
         try {
@@ -298,7 +288,7 @@
             parseBibleText(text);
             document.getElementById('loadingArea').style.display = 'none';
             document.getElementById('controlGrid').className += ' active';
-            document.getElementById('toolsRow').style.display = 'flex'; // 顯示工具列
+            document.getElementById('toolsRow').style.display = 'flex';
             initSelectors();
         } catch (e) {
             document.getElementById('loadingText').innerText = "錯誤：" + e.message;
@@ -332,40 +322,43 @@
         });
     }
 
-    // --- V19: 字體調整邏輯 ---
     function adjustFont(delta) {
-        currentFontSize += delta * 0.1; // 每次增減 0.1rem
-        if (currentFontSize < 0.8) currentFontSize = 0.8; // 最小限制
-        if (currentFontSize > 3.0) currentFontSize = 3.0; // 最大限制
-        
-        // 設定 CSS 變數
+        currentFontSize += delta * 0.1;
+        if (currentFontSize < 0.8) currentFontSize = 0.8;
+        if (currentFontSize > 3.0) currentFontSize = 3.0;
         document.documentElement.style.setProperty('--scripture-size', `${currentFontSize}rem`);
     }
 
-    // --- V19: 搜尋邏輯 ---
+    // --- V20 修復：智能搜尋邏輯 ---
     function searchBible() {
-        const keyword = document.getElementById('searchInput').value.trim();
+        const rawKeyword = document.getElementById('searchInput').value.trim();
         const resultsDiv = document.getElementById('searchResults');
         
-        if (!keyword) { alert("請輸入搜尋關鍵字"); return; }
-        if (keyword.length < 2) { alert("關鍵字太短，請至少輸入兩個字"); return; }
+        if (!rawKeyword) { alert("請輸入搜尋關鍵字"); return; }
+        
+        // 1. 移除關鍵字中的所有空格，確保「天 父」和「天父」都變成「天父」
+        const cleanKeyword = rawKeyword.replace(/\s+/g, '');
+        
+        if (cleanKeyword.length < 1) return;
 
         resultsDiv.style.display = 'block';
         resultsDiv.innerHTML = '<div style="padding:10px; color:#666;">🔍 正在搜尋全本聖經...</div>';
 
-        // 使用 setTimeout 讓 UI 先更新顯示「搜尋中」
         setTimeout(() => {
             let results = [];
             let count = 0;
-            const maxResults = 100; // 限制結果數量避免卡頓
+            const maxResults = 100;
 
-            // 遍歷所有書卷章節
             for (let book of bookOrder) {
                 for (let chap in bibleData[book]) {
                     for (let ver in bibleData[book][chap]) {
-                        const text = bibleData[book][chap][ver];
-                        if (text.includes(keyword)) {
-                            results.push({ book, chap, ver, text });
+                        const originalText = bibleData[book][chap][ver];
+                        
+                        // 2. 將經文內容的空格也移除，進行比對
+                        const cleanText = originalText.replace(/\s+/g, '');
+                        
+                        if (cleanText.includes(cleanKeyword)) {
+                            results.push({ book, chap, ver, text: originalText });
                             count++;
                             if (count >= maxResults) break;
                         }
@@ -375,18 +368,22 @@
                 if (count >= maxResults) break;
             }
 
-            // 渲染結果
             if (results.length === 0) {
-                resultsDiv.innerHTML = `<div style="padding:10px; color:#c0392b;">找不到關於「${keyword}」的經文。</div>`;
+                resultsDiv.innerHTML = `<div style="padding:10px; color:#c0392b;">找不到關於「${rawKeyword}」的經文。</div>`;
             } else {
                 let html = `<div style="padding:10px; border-bottom:1px solid #eee; color:#2c3e50;">
                     找到 ${results.length}${count >= maxResults ? '+' : ''} 處經文 (點擊跳轉):
                     <button style="float:right; border:none; background:none; color:#999; cursor:pointer;" onclick="closeSearch()">✕ 關閉</button>
                 </div>`;
                 
+                // 3. 準備高亮正則：將關鍵字每個字之間插入 \s* (允許任意空格)
+                // 例如 "天父" -> /天\s*父/g
+                const escapedKeyword = cleanKeyword.split('').map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s*');
+                const highlightRegex = new RegExp(`(${escapedKeyword})`, 'g');
+
                 results.forEach(res => {
-                    // 標記關鍵字
-                    const highlighted = res.text.replaceAll(keyword, `<span style="background:#f1c40f55; font-weight:bold;">${keyword}</span>`);
+                    // 使用正則在原文中進行高亮
+                    const highlighted = res.text.replace(highlightRegex, `<span style="background:#f1c40f55; font-weight:bold;">$1</span>`);
                     
                     html += `<div class="result-item" onclick="jumpToScripture('${res.book}', ${res.chap}, ${res.ver})">
                         <span class="result-ref">${res.book} ${res.chap}:${res.ver}</span>
@@ -403,21 +400,14 @@
     }
 
     function jumpToScripture(book, chap, ver) {
-        // 設定選單
         bookSel.value = book;
         updateChapters();
         chapSel.value = chap;
         updateStartVerses();
         startVerSel.value = ver;
-        
-        // 跳轉到該節 (設定範圍為該節到該節)
         updateEndVerses();
-        
-        // 顯示
         displayScripture();
         closeSearch();
-        
-        // 捲動到經文卡片
         document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
     }
 
