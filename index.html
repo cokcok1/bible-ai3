@@ -15,44 +15,51 @@
     <link rel="manifest" href="manifest.json">
 
     <style>
+        /* 定義變數：預設為淺色模式 (Light Mode) */
         :root {
             --bg: #f0f2f5; 
             --text: #333333;
             --primary: #2c3e50;
             --accent: #8e44ad;
             
+            /* 玻璃卡片顏色 */
             --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: 1px solid rgba(255, 255, 255, 0.9);
             --glass-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             
+            /* 輸入框與按鈕 */
             --input-bg: #ffffff;
             --input-border: #cccccc;
             --input-text: #333333;
             --nav-btn-bg: #ffffff;
             --nav-btn-color: #95a5a6;
             
+            /* 其他 */
             --scripture-size: 1.25rem;
             --highlight-color: #f1c40f55;
             --gemini-title-border: #f39c12;
         }
 
+        /* 深色模式變數 (Dark Mode) */
         [data-theme="dark"] {
-            --bg: #0f172a;
-            --text: #e2e8f0;
-            --primary: #60a5fa;
-            --accent: #a78bfa;
+            --bg: #0f172a; /* 深空藍背景 */
+            --text: #e2e8f0; /* 柔和亮白字 */
+            --primary: #60a5fa; /* 淺藍色標題 */
+            --accent: #a78bfa; /* 淺紫色強調 */
             
+            /* 深色玻璃質感 */
             --glass-bg: rgba(30, 41, 59, 0.85); 
             --glass-border: 1px solid rgba(255, 255, 255, 0.1);
             --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             
+            /* 深色輸入框 */
             --input-bg: #1e293b;
             --input-border: #475569;
             --input-text: #ffffff;
             --nav-btn-bg: #1e293b;
             --nav-btn-color: #94a3b8;
             
-            --highlight-color: #d9770688;
+            --highlight-color: #d9770688; /* 深色背景的高亮色 */
         }
 
         body {
@@ -136,7 +143,7 @@
         .nav-row { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 5px; }
         
         /* 統一按鈕高度 */
-        .read-btn, .nav-btn, .ai-btn, .grok-btn, .copy-btn, .share-btn, .context-btn {
+        .read-btn, .nav-btn, .ai-btn, .grok-btn, .copy-btn, .context-btn {
             height: 52px; box-sizing: border-box;
             display: flex; align-items: center; justify-content: center;
         }
@@ -163,12 +170,9 @@
             position: relative;
         }
 
-        /* V25: 功能按鈕區改為 2x2 網格 */
+        /* 功能按鈕區 */
         .action-area { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; /* 改為兩欄 */
-            gap: 10px; 
-            margin-bottom: 20px; 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; 
             align-items: stretch;
         }
         
@@ -184,8 +188,6 @@
         .ai-btn { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); }
         .grok-btn { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
         .copy-btn { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
-        /* V25: 分享按鈕顏色 (青綠色) */
-        .share-btn { background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%); }
 
         .ref-title {
             font-size: 1.3rem; font-weight: bold; color: var(--accent);
@@ -226,8 +228,9 @@
             color: var(--primary); margin-top: 15px; margin-bottom: 8px; font-size: 1.1em; 
         }
         .gemini-content p { margin-bottom: 10px; }
-        .gemini-content strong { color: #e74c3c; }
+        .gemini-content strong { color: #e74c3c; } 
         [data-theme="dark"] .gemini-content strong { color: #ff6b6b; }
+        
         .gemini-content ul { padding-left: 20px; margin-bottom: 10px; }
 
         .ai-loading { text-align: center; padding: 20px; font-style: italic; color: #888; display: none; }
@@ -245,8 +248,7 @@
 
         @media (max-width: 600px) { 
             .controls-grid { grid-template-columns: 1fr; } 
-            /* V25: 手機上也保持 2x2 網格 */
-            .action-area { grid-template-columns: 1fr 1fr; } 
+            .action-area { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -264,10 +266,10 @@
 
         <div class="tools-row" id="toolsRow" style="display:none;">
             <input type="text" id="searchInput" class="search-input" placeholder="輸入關鍵字 (如: 愛人如己)">
-            <button class="tool-btn" onclick="toggleTheme()" id="themeBtn" title="切換深色模式">🌙</button>
             <button class="tool-btn search-btn" onclick="searchBible()">🔍</button>
             <button class="tool-btn" onclick="adjustFont(-1)">A-</button>
             <button class="tool-btn" onclick="adjustFont(1)">A+</button>
+            <button class="tool-btn" onclick="toggleTheme()" id="themeBtn" title="切換深色模式">🌙</button>
         </div>
 
         <div id="searchResults" class="search-results"></div>
@@ -293,10 +295,9 @@
     <div id="resultCard" class="scripture-card">
         
         <div id="actionArea" class="action-area">
-            <button class="glass-btn ai-btn" onclick="callGeminiAPI()">✨ Gemini解經<br>(VPN/非香港)</button>
+            <button class="glass-btn ai-btn" onclick="callGeminiAPI()">✨ Gemini解經<br>(VPN/非香港用戶)</button>
             <button class="glass-btn grok-btn" onclick="openGrok()">🚀 複製並前往Grok</button>
             <button class="glass-btn copy-btn" id="copyBtn" onclick="copyPrompt()">📋 僅複製指令</button>
-            <button class="glass-btn share-btn" onclick="shareResult()">📤 分享結果</button>
         </div>
 
         <div class="ref-title" id="displayRef"></div>
@@ -349,7 +350,7 @@
 
     if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        document.getElementById('themeBtn').innerText = '☀️';
+        // 按鈕文字會由 onload 設定
     }
 
     window.onload = async function() {
@@ -498,6 +499,7 @@
         displayScripture();
     }
 
+    // --- 原有邏輯 ---
     const bookSel = document.getElementById('bookSelect');
     const chapSel = document.getElementById('chapterSelect');
     const startVerSel = document.getElementById('startVerseSelect');
@@ -706,38 +708,6 @@
         return html;
     }
 
-    // --- V25: 分享功能邏輯 ---
-    async function shareResult() {
-        const ref = document.getElementById('displayRef').innerText;
-        const script = document.getElementById('displayText').innerText;
-        
-        // 取得 AI 內容 (如果有的話)
-        const aiDiv = document.getElementById('geminiResult');
-        let aiText = "";
-        
-        // 只抓取 AI 的純文字 (去除 HTML 標籤以便分享)
-        if (aiDiv.innerText.trim()) {
-            aiText = "\n\n🤖 [AI 解讀重點]\n" + aiDiv.innerText.replace(/\n\n/g, '\n').substring(0, 1000) + "... (詳見網頁)";
-        }
-
-        const shareText = `📖 ${ref}\n\n${script}${aiText}\n\n(來自 聖經AI研讀)`;
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: ref,
-                    text: shareText,
-                    url: window.location.href
-                });
-            } catch (err) {
-                console.log('分享已取消');
-            }
-        } else {
-            // 電腦版或不支援 share API 則複製
-            fallbackCopy(shareText, () => alert("✅ 內容已複製！請貼上給朋友。"));
-        }
-    }
-
     function openGrok() {
         const txt = document.getElementById('hiddenPrompt').value;
         if (!txt) { alert("請先選擇經文"); return; }
@@ -754,7 +724,7 @@
             const btn = document.getElementById('copyBtn');
             const originalText = "📋 僅複製指令";
             btn.innerText = "✅ 成功";
-            btn.style.background = "#27ae60";
+            btn.style.backgroundColor = "#27ae60";
             setTimeout(() => { btn.innerText = originalText; btn.style.backgroundColor = ""; }, 2000);
         };
         if (navigator.clipboard && window.isSecureContext) {
@@ -781,7 +751,7 @@
         } else {
             textArea.select();
         }
-        try { if (document.execCommand('copy')) callback(); else alert("複製失敗"); } 
+        try { if (document.execCommand('copy')) callback(); else alert("複製失敗，請手動長按選擇"); } 
         catch (err) { alert("瀏覽器不支援複製"); }
         document.body.removeChild(textArea);
     }
