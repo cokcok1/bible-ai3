@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>聖經研讀 (V22)</title>
+    <title>聖經研讀 (V23)</title>
 
     <link rel="apple-touch-icon" sizes="180x180" href="bible-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="bible-icon.png">
@@ -130,18 +130,9 @@
             position: relative;
         }
 
-        /* 閱讀整章按鈕 (V22 新增) */
-        .context-btn {
-            width: 100%; margin-bottom: 20px; border-radius: 10px; border: none;
-            color: white; font-weight: bold; font-size: 1rem; cursor: pointer;
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); /* 藍色系 */
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-            display: none; /* 預設隱藏 */
-        }
-        .context-btn:active { transform: translateY(2px); }
-
+        /* V23: 功能按鈕區 (移回上方) */
         .action-area { 
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 25px; 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; 
             align-items: stretch;
         }
         
@@ -168,6 +159,16 @@
             margin-bottom: 20px; transition: font-size 0.2s;
         }
         .verse-num { color: #999; font-weight: normal; font-size: 0.8em; margin-right: 4px; }
+
+        /* 閱讀整章按鈕 */
+        .context-btn {
+            width: 100%; margin-top: 10px; margin-bottom: 20px; border-radius: 10px; border: none;
+            color: white; font-weight: bold; font-size: 1rem; cursor: pointer;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            display: none;
+        }
+        .context-btn:active { transform: translateY(2px); }
 
         /* Gemini 區塊 */
         .gemini-section {
@@ -247,16 +248,16 @@
 
     <div id="resultCard" class="scripture-card">
         
-        <div class="ref-title" id="displayRef"></div>
-        <div class="scripture-text" id="displayText"></div>
-
-        <button id="contextBtn" class="context-btn" onclick="switchToWholeChapter()">📖 閱讀整章 (顯示上下文)</button>
-
         <div id="actionArea" class="action-area">
             <button class="glass-btn ai-btn" onclick="callGeminiAPI()">✨ Gemini解經<br>(VPN/非香港用戶)</button>
             <button class="glass-btn grok-btn" onclick="openGrok()">🚀 複製並前往Grok</button>
             <button class="glass-btn copy-btn" id="copyBtn" onclick="copyPrompt()">📋 僅複製指令</button>
         </div>
+
+        <div class="ref-title" id="displayRef"></div>
+        <div class="scripture-text" id="displayText"></div>
+
+        <button id="contextBtn" class="context-btn" onclick="switchToWholeChapter()">📖 閱讀整章 (顯示上下文)</button>
 
         <div id="geminiSection" class="gemini-section">
             <div class="gemini-header">
@@ -268,7 +269,7 @@
             <div id="geminiResult" class="gemini-content"></div>
         </div>
 
-        <div class="footer-note" id="footerVer">Powered by Google Gemini AI解釋內容只供參考 2025-12-30 (V22)</div>
+        <div class="footer-note" id="footerVer">Powered by Google Gemini AI解釋內容只供參考 2025-12-30 (V23)</div>
     </div>
 </div>
 
@@ -283,7 +284,7 @@
     let currentFontSize = 1.25;
 
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V22)`;
+    document.getElementById('footerVer').innerText = `Powered by Google Gemini AI解釋內容只供參考 ${today} (V23)`;
 
     window.onload = async function() {
         try {
@@ -414,15 +415,13 @@
         startVerSel.value = ver;
         updateEndVerses();
         
-        // V22: 清空搜尋框
-        document.getElementById('searchInput').value = '';
+        document.getElementById('searchInput').value = ''; // 清空搜尋
         
         displayScripture();
         closeSearch();
         document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // --- V22: 切換到整章 ---
     function switchToWholeChapter() {
         startVerSel.value = 'all';
         updateEndVerses();
@@ -551,7 +550,7 @@
             Object.keys(verses).map(Number).sort((a,b)=>a-b).forEach(v => {
                 displayText += `<span class='verse-num'>[${v}]</span>${verses[v]}\n`;
             });
-            contextBtn.style.display = "none"; // 整章時隱藏按鈕
+            contextBtn.style.display = "none";
         } else {
             const startNum = parseInt(startVer);
             const endNum = parseInt(endVerSel.value);
@@ -565,7 +564,6 @@
                     displayText += `<span class='verse-num'>[${i}]</span>${bibleData[book][chap][i]}\n`;
                 }
             }
-            // V22: 顯示閱讀整章按鈕
             contextBtn.style.display = "block";
         }
 
